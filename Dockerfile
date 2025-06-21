@@ -1,10 +1,14 @@
+# Stage 1: Build the static site using Hugo
 FROM klakegg/hugo:ext-alpine AS builder
 WORKDIR /src
-COPY . .
-RUN hugo --baseURL=http://192.168.49.2:31401/
+COPY ./blog-content
+RUN hugo
 
+# Stage 2: Serve the static files using Nginx
 FROM nginx:1.27-alpine
-RUN rm -rf /usr/share/nginx/html/*
+# Salin hasil build dari stage sebelumnya
 COPY --from=builder /src/public /usr/share/nginx/html
+# Ekspos port 80
 EXPOSE 80
+# Perintah untuk menjalankan Nginx saat container dimulai
 CMD ["nginx", "-g", "daemon off;"]
