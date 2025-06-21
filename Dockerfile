@@ -1,5 +1,5 @@
 # Stage 1: Build the static site using Hugo
-FROM klakegg/hugo:0.125.4-ext-alpine AS builder
+FROM klakegg/hugo:0.127.0-ext-alpine AS builder
 WORKDIR /src
 COPY ./blog-content /src
 RUN hugo
