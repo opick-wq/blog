@@ -1,0 +1,75 @@
+---
+- name: Provision Server for Static Blog Project
+  hosts: server_utama
+  become: yes
+  tasks:
+
+    - name: Set proper Ubuntu codename for Docker repository
+      set_fact:
+        docker_ubuntu_codename: "{{ 'jammy' if ansible_distribution == 'Linux Mint' else ansible_distribution_release }}"
+
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install prerequisite packages for Docker
+      apt:
+        name: ['apt-transport-https', 'ca-certificates', 'curl', 'gnupg', 'lsb-release']
+        state: present
+
+    - name: Add Docker GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker repository
+      apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ docker_ubuntu_codename }} stable"
+        state: present
+
+    - name: Install Docker Engine
+      apt:
+        name: ['docker-ce', 'docker-ce-cli', 'containerd.io']
+        state: present
+
+    - name: Start and enable Docker service
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Download and install Prometheus Node Exporter
+      unarchive:
+        src: https://github.com/prometheus/node_exporter/releases/download/v1.7.0/node_exporter-1.7.0.linux-amd64.tar.gz
+        dest: /tmp/
+        remote_src: yes
+
+    - name: Move Node Exporter binary
+      copy:
+        src: /tmp/node_exporter-1.7.0.linux-amd64/node_exporter
+        dest: /usr/local/bin/
+        remote_src: yes
+        mode: '0755'
+
+    - name: Create systemd service for Node Exporter
+      copy:
+        dest: /etc/systemd/system/node_exporter.service
+        content: |
+          [Unit]
+          Description=Prometheus Node Exporter
+          Wants=network-online.target
+          After=network-online.target
+
+          [Service]
+          User=root
+          ExecStart=/usr/local/bin/node_exporter
+
+          [Install]
+          WantedBy=default.target
+
+    - name: Reload systemd and start Node Exporter
+      systemd:
+        name: node_exporter
+        daemon_reload: yes
+        state: started
+        enabled: yes

@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blog-statis-deployment
+spec:
+  replicas: 2 # Jalankan 2 pod untuk high availability
+  selector:
+    matchLabels:
+      app: blog-statis
+  template:
+    metadata:
+      labels:
+        app: blog-statis
+    spec:
+      containers:
+      - name: blog-statis-container
+        # Placeholder ini akan diganti oleh Jenkins
+        image: NAMA_USER_DOCKERHUB/blog-statis:latest
+        ports:
+        - containerPort: 80

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: blog-statis-service
+spec:
+  type: NodePort # Jenis service untuk diakses dari luar
+  selector:
+    app: blog-statis # Harus sama dengan label di Deployment
+  ports:
+  - protocol: TCP
+    port: 80       # Port internal di dalam cluster
+    targetPort: 80 # Port pada container
+    # nodePort: 30007 # Opsional, jika tidak diset, K8s akan memilih port acak > 30000
