@@ -1,7 +1,7 @@
 # Stage 1: Build the static site using Hugo
 FROM klakegg/hugo:ext-alpine AS builder
 WORKDIR /src
-COPY ./blog-content
+COPY ./blog-content /src
 RUN hugo
 
 # Stage 2: Serve the static files using Nginx
