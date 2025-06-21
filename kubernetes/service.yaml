@@ -10,4 +10,4 @@ spec:
   - protocol: TCP
     port: 80       # Port internal di dalam cluster
     targetPort: 80 # Port pada container
-    # nodePort: 30007 # Opsional, jika tidak diset, K8s akan memilih port acak > 30000
+    nodePort: 30007 # Port yang terbuka di setiap Node (harus unik dalam cluster dan dalam rentang 30000–32767)
