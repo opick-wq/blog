@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Selamat Datang di Blog Saya on My New Hugo Site</title>
+    <link>//localhost:1313/posts/</link>
+    <description>Recent content in Selamat Datang di Blog Saya on My New Hugo Site</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 21 Jun 2025 20:42:51 +0700</lastBuildDate>
+    <atom:link href="//localhost:1313/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Artikel Pertama</title>
+      <link>//localhost:1313/posts/artikel-pertama/</link>
+      <pubDate>Sat, 21 Jun 2025 20:42:51 +0700</pubDate>
+      <guid>//localhost:1313/posts/artikel-pertama/</guid>
+      <description></description>
+    </item>
+  </channel>
+</rss>
