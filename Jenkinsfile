@@ -44,7 +44,7 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 // Gunakan wrapper withKubeconfig untuk memuat credentials K8s secara aman
-                withKubeconfig(credentialsId: 'kubeconfig-credentials') {
+                withKubeConfig(credentialsId: 'kubeconfig-credentials') {
                     // Semua perintah 'kubectl' di dalam blok ini akan menggunakan kubeconfig yang disediakan
                     script {
                         echo "Updating Kubernetes deployment with image: ${DOCKER_IMAGE}:${BUILD_NUMBER}"
