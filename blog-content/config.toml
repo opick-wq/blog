@@ -1,4 +1,0 @@
-theme = "ananke"
-baseURL = 'http://192.168.49.2:31401/'
-languageCode = 'en-us'
-title = 'My New Hugo Site'
