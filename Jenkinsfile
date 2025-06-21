@@ -2,18 +2,27 @@ pipeline {
     agent any
 
     environment {
-        // ID credentials untuk Docker Hub
-        DOCKER_HUB_CREDENTIALS = credentials('docker-hub') 
-        // ID credentials untuk file kubeconfig Anda
-        KUBECONFIG_CREDENTIALS = credentials('kubeconfig-dev') // Ganti ID jika perlu
-        // Nama image Docker Anda
-        DOCKER_IMAGE = "sultan877/blog-statis" 
+        DOCKER_HUB_CREDENTIALS = credentials('docker-hub')
+        KUBECONFIG_CREDENTIALS = credentials('kubeconfig-credentials')
+        DOCKER_IMAGE = "sultan877/blog-statis"
     }
 
     stages {
-        // Stage 'Checkout' tidak diperlukan di sini, 
-        // karena Jenkins sudah otomatis melakukan checkout kode dari SCM
-        // yang dikonfigurasi di pengaturan Pipeline job.
+        // --- TAMBAHKAN STAGE INI ---
+        stage('Checkout with Submodules') {
+            steps {
+                echo "Checking out repository and all submodules..."
+                // Perintah checkout yang dimodifikasi untuk mengambil submodule (tema)
+                checkout([
+                    $class: 'GitSCM', 
+                    branches: [[name: '*/main']], 
+                    userRemoteConfigs: [[url: 'https://github.com/opick-wq/blog.git']],
+                    // Baris ini adalah kuncinya:
+                    extensions: [[$class: 'SubmoduleOption', recursive: true]]
+                ])
+            }
+        }
+        // --- AKHIR DARI BAGIAN YANG DITAMBAHKAN ---
 
         stage('Build Docker Image') {
             steps {
@@ -24,11 +33,14 @@ pipeline {
             }
         }
 
+        // ... sisa stages lainnya tetap sama ...
+        // (Push to Docker Hub, Deploy to Kubernetes)
+        // ... ...
+
         stage('Push to Docker Hub') {
             steps {
                 script {
                     echo "Logging in to Docker Hub..."
-                    // Login, Push, dan Tag image
                     sh "echo $DOCKER_HUB_CREDENTIALS_PSW | docker login -u $DOCKER_HUB_CREDENTIALS_USR --password-stdin"
                     
                     echo "Pushing image ${DOCKER_IMAGE}:${BUILD_NUMBER} to Docker Hub..."
@@ -43,12 +55,9 @@ pipeline {
 
         stage('Deploy to Kubernetes') {
             steps {
-                // Gunakan wrapper withKubeconfig untuk memuat credentials K8s secara aman
-                withKubeConfig(credentialsId: 'kubeconfig-dev') {
-                    // Semua perintah 'kubectl' di dalam blok ini akan menggunakan kubeconfig yang disediakan
+                withKubeconfig(credentialsId: 'kubeconfig-credentials') {
                     script {
                         echo "Updating Kubernetes deployment with image: ${DOCKER_IMAGE}:${BUILD_NUMBER}"
-                        // Ganti tag image di file deployment.yaml secara dinamis
                         sh "sed -i 's|image: .*|image: ${DOCKER_IMAGE}:${BUILD_NUMBER}|g' kubernetes/deployment.yaml"
                         
                         echo "Applying deployment to Kubernetes cluster..."
@@ -58,7 +67,6 @@ pipeline {
                         sh "kubectl apply -f kubernetes/service.yaml"
 
                         echo "Verifying deployment rollout status..."
-                        // Perintah ini akan menunggu sampai deployment selesai dan berhasil
                         sh "kubectl rollout status deployment/blog-statis-deployment --timeout=2m"
                     }
                 }
@@ -67,10 +75,8 @@ pipeline {
     }
     post {
         always {
-            // Selalu logout dari Docker Hub dan hapus image lokal untuk kebersihan
             echo "Logging out from Docker Hub..."
             sh "docker logout"
-            // Menggunakan -f (force) untuk menghindari error jika build gagal dan image tidak ada
             echo "Cleaning up local Docker image..."
             sh "docker rmi -f ${DOCKER_IMAGE}:${BUILD_NUMBER}"
         }
