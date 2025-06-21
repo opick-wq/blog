@@ -2,15 +2,15 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_HUB_CREDENTIALS = credentials('docker-hub-credentials') // ID credentials di Jenkins
-        DOCKER_IMAGE = "NAMA_USER_DOCKERHUB/blog-statis" // Ganti dengan nama user Anda
+        DOCKER_HUB_CREDENTIALS = credentials('docker-hub') // ID credentials di Jenkins
+        DOCKER_IMAGE = "sultan877/blog-statis" // Ganti dengan nama user Anda
     }
 
     stages {
         stage('Checkout') {
             steps {
                 // Ambil kode dari Git
-                git branch: 'main', url: 'https://github.com/<USERNAME>/projek-blog-statis.git'
+                git branch: 'main', url: 'https://github.com/opick-wq/blog.git'
             }
         }
 
