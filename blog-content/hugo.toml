@@ -1,4 +1,4 @@
 theme = "ananke"
-baseURL = 'http://192.168.49.2:30007/'
+baseURL = 'http://192.168.67.2:30007/'
 languageCode = 'en-us'
 title = 'My New Hugo Site'
